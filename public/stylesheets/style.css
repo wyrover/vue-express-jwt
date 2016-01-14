@@ -1,0 +1,16 @@
+body {
+  padding: 50px;
+  font: 17px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+a {
+  color: #00b7ff;
+}
+.container {
+  margin: 0 auto;
+  background-color: #ff6347;
+}
+@media (min-width: 1200px) {
+  .container {
+    width: 1200px;
+  }
+}
