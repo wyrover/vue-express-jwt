@@ -9,7 +9,7 @@
       label(for="usernameInput") Username:
       input#usernameInput(type="text" name="username", v-model="credentials.username", require)
     div
-      label(for="passwordInput") Username:
+      label(for="passwordInput") Password:
       input#passwordInput(type="password" name="password", v-model="credentials.password", require)
     input(type="submit" value="login")
 
@@ -26,7 +26,7 @@ import auth from '../auth'
 
 export default
 {
-  name: 'Home-View',
+  name: 'home-view',
 
   data: function() {
     return {

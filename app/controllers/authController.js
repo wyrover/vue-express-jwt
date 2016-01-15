@@ -19,14 +19,14 @@ exports.postLogin = function(req, res)
 
     if (!user)
     {
-      res.status(400).json({ success: false, message: 'there is no user with this username' })
+      res.status(422).send({ success: false, message: 'there is no user with this username' })
     }
     else if ( user )
     {
       // check for password mach
       if (user.password !== req.body.password)
       {
-        res.json({success: false, message: 'Incorect Password'})
+        res.status(422).send({success: false, message: 'Incorect Password'})
       } else {
         // Create a token for the user
         var token = jwt.sign(user, config.secret, {
@@ -36,7 +36,8 @@ exports.postLogin = function(req, res)
         res.json({
           success: true,
           message: 'Enjoy your token!',
-          token: token
+          token: token,
+          profile: JSON.stringify(user, ['_id', 'username', 'email'])
         })
       }
     }

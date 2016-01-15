@@ -13904,13 +13904,16 @@ exports.default = {
 
   login: function login(context, creds, redirect) {
     context.$http.post(LOGIN_URL, creds).then(function (response) {
-      if (response.data.success === false) context.error = response.data.message;else {
-        localStorage.setItem('id_token', response.data.token);
-        this.user.authenticated = true;
+      localStorage.setItem('id_token', response.data.token);
+      localStorage.setItem('profile', response.data.profile);
 
-        if (redirect) _main.router.go(redirect);
-      }
-    }.bind(this));
+      this.user.authenticated = true;
+      this.user.profile = JSON.parse(localStorage.getItem('profile'));
+
+      if (redirect) _main.router.go(redirect);
+    }.bind(this), function (response) {
+      context.error = response.data.message;
+    });
   },
   signup: function signup(context, creds, redirect) {
     var _this = this;
@@ -13928,16 +13931,21 @@ exports.default = {
     });
   },
   logout: function logout() {
-    alert('try to logout');
     localStorage.removeItem('id_token');
+    localStorage.removeItem('profile');
     this.user.authenticated = false;
+    this.user.profile = {};
   },
   checkAuth: function checkAuth() {
     var jwt = localStorage.getItem('id_token');
+    var profile = JSON.parse(localStorage.getItem('profile'));
+
     if (jwt) {
       this.user.authenticated = true;
+      this.user.profile = profile;
     } else {
       this.user.authenticated = false;
+      this.user.profile = {};
     }
   },
   getAuthHeader: function getAuthHeader() {
@@ -14052,7 +14060,7 @@ if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
   if (!hotAPI.compatible) return
-  var id = "e:\\CodeArea\\Testing\\nodeServer\\resources\\assets\\js\\views\\App.vue"
+  var id = "E:\\CodeArea\\gitit\\vue-express-jwt\\resources\\assets\\js\\views\\App.vue"
   if (!module.hot.data) {
     hotAPI.createRecord(id, module.exports)
   } else {
@@ -14060,35 +14068,6 @@ if (module.hot) {(function () {  module.hot.accept()
   }
 })()}
 },{"../auth":28,"vue":27,"vue-hot-reload-api":1}],31:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = {
-  name: 'Home-View',
-
-  data: function data() {
-    return {
-      title: 'superApp',
-      message: 'the best app of the world...'
-    };
-  }
-};
-if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div><h1>{{title}}</h1><p>{{message}}</p></div>"
-if (module.hot) {(function () {  module.hot.accept()
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), true)
-  if (!hotAPI.compatible) return
-  var id = "e:\\CodeArea\\Testing\\nodeServer\\resources\\assets\\js\\views\\Home.vue"
-  if (!module.hot.data) {
-    hotAPI.createRecord(id, module.exports)
-  } else {
-    hotAPI.update(id, module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
-  }
-})()}
-},{"vue":27,"vue-hot-reload-api":1}],32:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -14102,7 +14081,44 @@ var _auth2 = _interopRequireDefault(_auth);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 exports.default = {
-  name: 'Home-View',
+  name: 'home',
+
+  data: function data() {
+    return {
+      title: 'superApp',
+      message: 'the best app of the world...',
+      user: _auth2.default.user
+    };
+  }
+};
+if (module.exports.__esModule) module.exports = module.exports.default
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div><h1>{{title}}</h1><p v-if=\"user.authenticated\">welcome back {{user.profile.username}} 2 {{message}}</p><p v-else=\"v-else\">{{message}}</p><pre>{{$data|json}}</pre></div>"
+if (module.hot) {(function () {  module.hot.accept()
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), true)
+  if (!hotAPI.compatible) return
+  var id = "E:\\CodeArea\\gitit\\vue-express-jwt\\resources\\assets\\js\\views\\Home.vue"
+  if (!module.hot.data) {
+    hotAPI.createRecord(id, module.exports)
+  } else {
+    hotAPI.update(id, module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
+  }
+})()}
+},{"../auth":28,"vue":27,"vue-hot-reload-api":1}],32:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _auth = require('../auth');
+
+var _auth2 = _interopRequireDefault(_auth);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.default = {
+  name: 'home-view',
 
   data: function data() {
     return {
@@ -14130,12 +14146,12 @@ exports.default = {
 
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div><h1>{{title}}</h1><p>{{message}}</p></div><div class=\"Form--Wrapper\"><form action=\"auth/login\" method=\"POST\" @submit.prevent=\"login\"><div><label for=\"usernameInput\">Username:</label><input id=\"usernameInput\" type=\"text\" name=\"username\" v-model=\"credentials.username\" require=\"require\"/></div><div><label for=\"passwordInput\">Username:</label><input id=\"passwordInput\" type=\"password\" name=\"password\" v-model=\"credentials.password\" require=\"require\"/></div><input type=\"submit\" value=\"login\"/></form><div v-if=\"error\"><p>{{error}}</p></div></div>"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div><h1>{{title}}</h1><p>{{message}}</p></div><div class=\"Form--Wrapper\"><form action=\"auth/login\" method=\"POST\" @submit.prevent=\"login\"><div><label for=\"usernameInput\">Username:</label><input id=\"usernameInput\" type=\"text\" name=\"username\" v-model=\"credentials.username\" require=\"require\"/></div><div><label for=\"passwordInput\">Password:</label><input id=\"passwordInput\" type=\"password\" name=\"password\" v-model=\"credentials.password\" require=\"require\"/></div><input type=\"submit\" value=\"login\"/></form><div v-if=\"error\"><p>{{error}}</p></div></div>"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
   if (!hotAPI.compatible) return
-  var id = "e:\\CodeArea\\Testing\\nodeServer\\resources\\assets\\js\\views\\Login.vue"
+  var id = "E:\\CodeArea\\gitit\\vue-express-jwt\\resources\\assets\\js\\views\\Login.vue"
   if (!module.hot.data) {
     hotAPI.createRecord(id, module.exports)
   } else {

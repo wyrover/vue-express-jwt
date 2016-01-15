@@ -15,20 +15,22 @@ export default {
     context.$http.post(LOGIN_URL, creds)
       .then( function( response )
       {
-        if ( response.data.success === false ) context.error = response.data.message
+        localStorage.setItem('id_token', response.data.token)
+        localStorage.setItem('profile', response.data.profile)
+        
+        this.user.authenticated = true
+        this.user.profile =
+            JSON.parse(localStorage.getItem('profile'))
 
-        else
-        {
-          localStorage.setItem('id_token', response.data.token)
-          this.user.authenticated = true
+        if(redirect) router.go(redirect)
 
-          if(redirect) router.go(redirect)
-        }
-
-      }.bind(this))
+      }.bind(this), function( response ) {
+        context.error = response.data.message
+      })
   },
 
-  signup(context, creds, redirect) {
+  signup(context, creds, redirect) 
+  {
     context.$http.post(SIGNUP_URL, creds, (data) => {
       localStorage.setItem('id_token', data.id_token)
 
@@ -45,18 +47,24 @@ export default {
 
   logout()
   {
-    alert('try to logout')
     localStorage.removeItem('id_token')
+    localStorage.removeItem('profile')
     this.user.authenticated = false
+    this.user.profile = {}
   },
 
   checkAuth() {
     var jwt = localStorage.getItem('id_token')
+    var profile =
+        JSON.parse(localStorage.getItem('profile'))
+    
     if(jwt) {
       this.user.authenticated = true
+      this.user.profile = profile
     }
     else {
       this.user.authenticated = false
+      this.user.profile = {}
     }
   },
 
